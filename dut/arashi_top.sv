@@ -1,4 +1,3 @@
-`timescale 1ns/1ps;
 module arashi_top # (DATA_WIDTH = 32,
                      MEM_WIDTH  = 10,
                      THREAD_NUM = 4)
