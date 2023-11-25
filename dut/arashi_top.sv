@@ -26,8 +26,17 @@ module arashi_top # (DATA_WIDTH = 32,
             // read enable
             wire        [THREAD_NUM-1:0]            r_ena;
 
-            // available for read
-            wire        [THREAD_NUM-1:0]            avail;
+            // data available in cache
+            wire        [THREAD_NUM-1:0]            cache_avail;
+
+            // thread id to read from cache
+            wire        [THREAD_NUM_WIDTH-1:0]      toread;
+
+            // enable reading from cache
+            wire                                    rcache;
+
+            // data read from cache
+            wire        [DATA_WIDTH-1:0]            cache2mem;
 
     // decode read/write enable from ctrl signal
     generate
@@ -45,20 +54,23 @@ module arashi_top # (DATA_WIDTH = 32,
     endgenerate
 
     // for each thread, determin the write address
-    arashi_cache # (THREAD_NUM,
-                    DATA_WIDTH)
+    arashi_cache # (DATA_WIDTH,
+                    THREAD_NUM_WIDTH)
              cache (.clk(clk),
                     .rstn(rstn),
                     .w_ena(w_ena),
-                    .r_ena(r_ena),
+                    .toread(toread),
+                    .rcache(rcache),
                     .data_in(data_in),
-                    .data_out(data_out),
-                    .avail(avail));
+                    .data_out(cache2mem),
+                    .avail(cache_avail));
 
-    arashi_mem # (DATA_WIDTH,
-                  MEM_WIDTH,
-                  THREAD_NUM_WIDTH) 
-             mem (.clk(clk),
-                  .rstn(rstn),
-                  .avail(avail));
+    arashi_arbiter # (DATA_WIDTH,
+                      MEM_WIDTH,
+                      THREAD_NUM_WIDTH) 
+             arbiter (.clk(clk),
+                      .rstn(rstn),
+                      .avail(cache_avail),
+                      .toread(toread),
+                      .rcache(rcache));
 endmodule

@@ -1,30 +1,34 @@
-module arashi_mem # (DATA_WIDTH,
-                     MEM_WIDTH,
-                     THREAD_NUM_WIDTH)
-                    (clk,
-                     rstn,
-                     avail,
-                     r_ena);
+module arashi_arbiter # (DATA_WIDTH,
+                         MEM_WIDTH,
+                         THREAD_NUM_WIDTH)
+                        (clk,
+                         rstn,
+                         avail,
+                         toread,
+                         rcache);
     localparam THREAD_NUM = 1 << THREAD_NUM_WIDTH;
 
     input   wire                                    clk;
     input   wire                                    rstn;
     input   wire    [THREAD_NUM-1:0]                avail;
-    output  logic   [THREAD_NUM-1:0]                r_ena;
+    output  logic   [THREAD_NUM_WIDTH-1:0]          toread;
+    output  logic                                   rcache;
 
-            logic   [THREAD_NUM_WIDTH-1:0]          toread;
             wire    [THREAD_NUM-1:0]                savail;
             wire    [THREAD_NUM_WIDTH-1:0]          next;
             wire                                    any_avail;
 
     always_ff @ (posedge clk) begin
         if (!rstn) begin
-            r_ena <= 0;
             toread <= 0;
+            rcache <= 0;
         end else begin
             if (any_avail) begin
-                r_ena <= 1 << toread;
                 toread <= toread + next;
+                rcache <= 1;
+            end else begin
+                toread <= 0;
+                rcache <= 0;
             end
         end
     end

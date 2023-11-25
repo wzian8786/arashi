@@ -3,4 +3,4 @@
 ../dut/arashi_ctrl_decoder.sv
 ../dut/arashi_cache.sv
 ../dut/arashi_thread_cache.sv
-../dut/arashi_mem.sv
+../dut/arashi_arbiter.sv

@@ -40,5 +40,8 @@ module arashi_thread_cache # (DATA_WIDTH)
     end
 
     assign backlog = w_ptr - r_ptr;
-    assign avail = |backlog;
+    // It's not neccesary to make arbiter wait for an extra cycle
+    // assign avail = |backlog;
+    assign avail = (backlog == 0) ? w_ena :
+                   (backlog == 1) ? ~r_ena : 1;
 endmodule
