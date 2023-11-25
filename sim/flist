@@ -1,0 +1,6 @@
+../dut/arashi_top.sv
+../dut/arashi_mem.sv
+../dut/arashi_ctrl_decoder.sv
+../dut/arashi_arbiter.sv
+../dut/arashi_arbiter_4.sv
+../tb/tb.sv

@@ -1,0 +1,9 @@
+*.swp
+*.fsdb
+sim/csrc
+sim/simv
+sim/simv.daidir
+sim/novas*
+sim/ucli.key
+sim/vc_hdrs.h
+sim/verdiLog
