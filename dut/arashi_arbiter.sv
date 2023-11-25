@@ -15,7 +15,7 @@ module arashi_arbiter # (DATA_WIDTH,
     output  logic                                   rcache;
 
             wire    [THREAD_NUM-1:0]                savail;
-            wire    [THREAD_NUM_WIDTH-1:0]          next;
+            logic   [THREAD_NUM_WIDTH-1:0]          next;
             wire                                    any_avail;
 
     always_ff @ (posedge clk) begin
@@ -36,6 +36,7 @@ module arashi_arbiter # (DATA_WIDTH,
     assign savail = { avail, avail } >> toread;
     assign any_avail = |avail;
 
+`ifdef SIM
     generate
         if (THREAD_NUM_WIDTH == 2) begin
             active_0 a0(next[0], savail[0], savail[1], savail[2], savail[3]);
@@ -98,8 +99,56 @@ module arashi_arbiter # (DATA_WIDTH,
                                any_avail_2 ? next_2[0] : next_3[0];
         end
     endgenerate
+`else
+    generate
+    if (THREAD_NUM_WIDTH == 2) begin
+        always_comb begin
+            if (savail[0])      next = 2'b00;
+            else if (savail[1]) next = 2'b01;
+            else if (savail[2]) next = 2'b10;
+            else if (savail[3]) next = 2'b11;
+            else                next = 2'b00;
+        end
+    end
+    if (THREAD_NUM_WIDTH == 3) begin
+        always_comb begin
+            if (savail[0])     next = 3'b000;
+            else if(savail[1]) next = 3'b001;
+            else if(savail[2]) next = 3'b010;
+            else if(savail[3]) next = 3'b011;
+            else if(savail[4]) next = 3'b100;
+            else if(savail[5]) next = 3'b101;
+            else if(savail[6]) next = 3'b110;
+            else if(savail[7]) next = 3'b111;
+            else               next = 3'b000;
+        end
+    end
+    if (THREAD_NUM_WIDTH == 4) begin
+        always_comb begin
+            if (savail[0])      next = 4'b0000;
+            else if(savail[1])  next = 4'b0001;
+            else if(savail[2])  next = 4'b0010;
+            else if(savail[3])  next = 4'b0011;
+            else if(savail[4])  next = 4'b0100;
+            else if(savail[5])  next = 4'b0101;
+            else if(savail[6])  next = 4'b0110;
+            else if(savail[7])  next = 4'b0111;
+            else if(savail[8])  next = 4'b111;
+            else if(savail[9])  next = 4'b1001;
+            else if(savail[10]) next = 4'b1010;
+            else if(savail[11]) next = 4'b1011;
+            else if(savail[12]) next = 4'b1100;
+            else if(savail[13]) next = 4'b1101;
+            else if(savail[14]) next = 4'b1110;
+            else if(savail[15]) next = 4'b1111;
+            else                next = 4'b0000;
+        end
+    end
+    endgenerate
+`endif
 endmodule
 
+`ifdef SIM
 primitive active_0(output o0,
                    input  i0,
                    input  i1,
@@ -144,3 +193,4 @@ primitive active_any(output o,
         0  0  0  0 : 0;
     endtable
 endprimitive
+`endif
