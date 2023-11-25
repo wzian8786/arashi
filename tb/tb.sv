@@ -1,7 +1,7 @@
 `timescale 1ns/1ps;
 class R;
     rand logic  [7:0]   ctrl;
-    rand logic  [127:0] data;
+    rand logic  [127:0] data_in;
 endclass
 
 module tb;
@@ -9,8 +9,8 @@ module tb;
     reg rstn;
 
     logic   [7:0]       ctrl;
-    logic   [127:0]     data;
-    wire    [127:0]     out;
+    logic   [127:0]     data_in;
+    wire    [127:0]     data_out;
 
     R               r;
 
@@ -31,8 +31,8 @@ module tb;
         for (integer i = 0; i < 10000; i++) begin
             #10;
             r.randomize();
-            ctrl[i] = r.ctrl;
-            data[i] = r.data;
+            ctrl = r.ctrl;
+            data_in = r.data_in;
         end
 
         #10 $finish();
@@ -41,6 +41,6 @@ module tb;
     arashi_top dut(.clk(clk),
                    .rstn(rstn),
                    .ctrl(ctrl),
-                   .in(data),
-                   .out(out));
+                   .data_in(data_in),
+                   .data_out(data_out));
 endmodule

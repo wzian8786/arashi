@@ -1,9 +1,9 @@
 module arashi_ctrl_decoder (ctrl,
-                            wr,
-                            rd);
+                            w_ena,
+                            r_ena);
     input   wire    [1:0]   ctrl;
-    output  wire            wr;
-    output  wire            rd;
-    assign wr = ctrl[1];
-    assign rd = ctrl[0] & ~ctrl[1];
+    output  wire            w_ena;
+    output  wire            r_ena;
+    assign w_ena = ctrl[1];
+    assign r_ena = ctrl[0] & ~ctrl[1];
 endmodule
