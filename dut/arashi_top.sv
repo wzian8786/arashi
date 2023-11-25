@@ -1,11 +1,14 @@
 module arashi_top # (DATA_WIDTH = 32,
                      MEM_WIDTH  = 10,
-                     THREAD_NUM = 4)
+                     THREAD_NUM_WIDTH = 2)
                     (clk,
                      rstn,
                      ctrl,
                      data_in,
                      data_out);
+
+    localparam THREAD_NUM = 1 << THREAD_NUM_WIDTH;
+
     // system clock
     input   wire                                    clk;
     // reset if 0
@@ -23,6 +26,9 @@ module arashi_top # (DATA_WIDTH = 32,
             // read enable
             wire        [THREAD_NUM-1:0]            r_ena;
 
+            // available for read
+            wire        [THREAD_NUM-1:0]            avail;
+
     // decode read/write enable from ctrl signal
     generate
         genvar i;
@@ -34,15 +40,25 @@ module arashi_top # (DATA_WIDTH = 32,
     endgenerate
 
     generate
-        if (THREAD_NUM >= 32) $error("Bad parameter THREAD_NUM=%d, it cannot be larger than 32", THREAD_NUM);
-        if (THREAD_NUM % 4) $error("Bad parameter THREAD_NUM=%d, it must be a multiple of 4", THREAD_NUM);
+        if (THREAD_NUM_WIDTH > 4) $error("Bad parameter THREAD_NUM_WIDTH=%d, it cannot be larger than 4", THREAD_NUM);
+        if (THREAD_NUM_WIDTH < 2) $error("Bad parameter THREAD_NUM_WIDTH=%d, it cannot be smaller than 2", THREAD_NUM);
     endgenerate
 
     // for each thread, determin the write address
-    arashi_cache # (THREAD_NUM, DATA_WIDTH) cache(.clk(clk),
-                                                  .rstn(rstn),
-                                                  .w_ena(w_ena),
-                                                  .r_ena(r_ena),
-                                                  .data_in(data_in),
-                                                  .data_out(data_out));
+    arashi_cache # (THREAD_NUM,
+                    DATA_WIDTH)
+             cache (.clk(clk),
+                    .rstn(rstn),
+                    .w_ena(w_ena),
+                    .r_ena(r_ena),
+                    .data_in(data_in),
+                    .data_out(data_out),
+                    .avail(avail));
+
+    arashi_mem # (DATA_WIDTH,
+                  MEM_WIDTH,
+                  THREAD_NUM_WIDTH) 
+             mem (.clk(clk),
+                  .rstn(rstn),
+                  .avail(avail));
 endmodule

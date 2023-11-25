@@ -4,13 +4,15 @@ module arashi_thread_cache # (DATA_WIDTH)
                               w_ena,
                               r_ena,
                               data_in,
-                              data_out);
+                              data_out,
+                              avail);
     input   wire                        clk;
     input   wire                        rstn;
     input   wire                        w_ena;
     input   wire                        r_ena;
     input   wire    [DATA_WIDTH-1:0]    data_in;
     output  logic   [DATA_WIDTH-1:0]    data_out;
+    output  wire                        avail;
 
             logic   [DATA_WIDTH-1:0]    buff[3:0];
             logic   [1:0]               w_ptr;
@@ -38,4 +40,5 @@ module arashi_thread_cache # (DATA_WIDTH)
     end
 
     assign backlog = w_ptr - r_ptr;
+    assign avail = |backlog;
 endmodule

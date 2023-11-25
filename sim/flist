@@ -1,5 +1,6 @@
+../tb/tb.sv
 ../dut/arashi_top.sv
 ../dut/arashi_ctrl_decoder.sv
 ../dut/arashi_cache.sv
 ../dut/arashi_thread_cache.sv
-../tb/tb.sv
+../dut/arashi_mem.sv
