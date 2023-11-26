@@ -73,4 +73,11 @@ module arashi_top # (DATA_WIDTH = 32,
                       .avail(cache_avail),
                       .toread(toread),
                       .rcache(rcache));
+
+    arashi_mem # (DATA_WIDTH,
+                  MEM_WIDTH)
+             mem (.clk(clk),
+                  .rstn(rstn),
+                  .rcache(rcache),
+                  .cache2mem(cache2mem));
 endmodule
