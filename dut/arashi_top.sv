@@ -6,6 +6,7 @@ module arashi_top # (DATA_WIDTH = 32,
                      ctrl,
                      data_in,
                      w_ready,
+                     r_ready,
                      data_out);
 
     localparam THREAD_NUM = 1 << THREAD_NUM_WIDTH;
@@ -18,8 +19,8 @@ module arashi_top # (DATA_WIDTH = 32,
     input   wire        [THREAD_NUM*2-1:0]          ctrl;
     // input data (write data)
     input   wire        [DATA_WIDTH*THREAD_NUM-1:0] data_in;
-    // 1 indict data is cached
     output  wire        [THREAD_NUM-1:0]            w_ready;
+    output  wire        [THREAD_NUM-1:0]            r_ready;
     // output data
     output  wire        [DATA_WIDTH*THREAD_NUM-1:0] data_out;
 
@@ -69,5 +70,6 @@ module arashi_top # (DATA_WIDTH = 32,
                   .r_ena(r_ena),
                   .cache_ready(cache_ready),
                   .cache2mem(cache2mem),
-                  .data_out(data_out));
+                  .data_out(data_out),
+                  .r_ready(r_ready));
 endmodule

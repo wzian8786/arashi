@@ -32,7 +32,7 @@ module arashi_arbiter # (DATA_WIDTH,
         end
     end
 
-    assign savail = { avail, avail } >> thread_id;
+    assign savail = { avail, avail } >> (thread_id + 1);
     assign any_avail = |avail;
 
 `ifdef SIM
