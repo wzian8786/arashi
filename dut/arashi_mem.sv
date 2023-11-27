@@ -28,8 +28,54 @@ module arashi_mem # (DATA_WIDTH,
             logic   [MEM_WIDTH-1:0]             backlog;
 
 `ifdef SIM
-            logic   [DATA_WIDTH-1:0]    mem[(1<<MEM_WIDTH)-1:0];
+            logic   [DATA_WIDTH-1:0]            mem             [(1<<MEM_WIDTH)-1:0];
 `endif
+
+            logic   [DATA_WIDTH-1:0]            data_out_reg    [THREAD_NUM-1:0];
+
+    generate
+    if (THREAD_NUM_WIDTH == 2) begin
+        assign data_out = {
+            data_out_reg[3],
+            data_out_reg[2],
+            data_out_reg[1],
+            data_out_reg[0]
+        };
+    end
+    if (THREAD_NUM_WIDTH == 3) begin
+        assign data_out = {
+            data_out_reg[7],
+            data_out_reg[6],
+            data_out_reg[5],
+            data_out_reg[4],
+            data_out_reg[3],
+            data_out_reg[2],
+            data_out_reg[1],
+            data_out_reg[0]
+        };
+    end
+    if (THREAD_NUM_WIDTH == 4) begin
+        assign data_out = {
+            data_out_reg[15],
+            data_out_reg[14],
+            data_out_reg[13],
+            data_out_reg[12],
+            data_out_reg[11],
+            data_out_reg[10],
+            data_out_reg[9],
+            data_out_reg[8],
+            data_out_reg[7],
+            data_out_reg[6],
+            data_out_reg[5],
+            data_out_reg[4],
+            data_out_reg[3],
+            data_out_reg[2],
+            data_out_reg[1],
+            data_out_reg[0]
+        };
+    end
+    endgenerate
+
     always_ff @ (posedge clk) begin
         if (!rstn) begin
             for (integer i = 0; i < 1 << MEM_WIDTH; i++) begin
@@ -37,9 +83,13 @@ module arashi_mem # (DATA_WIDTH,
                 mem[i] <= 0;
 `endif
             end
+            for (integer i = 0; i < THREAD_NUM; i++) begin
+                data_out_reg[i] <= 0;
+            end
             wptr <= 0;
             rptr <= 0;
             cache_ready_reg <= 0;
+            r_ready <= 0;
         end
         else begin
             cache_ready_reg <= cache_ready;
@@ -53,7 +103,7 @@ module arashi_mem # (DATA_WIDTH,
 
             if (read_ready && backlog > 0) begin
 `ifdef SIM
-                data_out[(read_thread_id+1)*DATA_WIDTH-1:read_thread_id*DATA_WIDTH] = mem[rptr];
+                data_out_reg[read_thread_id] <= mem[rptr];
 `endif
                 rptr <= rptr + 1;
                 r_ready <= 1 << read_thread_id;
