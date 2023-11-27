@@ -1,4 +1,4 @@
-# arashi 嵐
+# 嵐 Arashi
 
 ## run simulation
 ```sh
