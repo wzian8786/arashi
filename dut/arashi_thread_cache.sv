@@ -4,6 +4,7 @@ module arashi_thread_cache # (DATA_WIDTH)
                               w_ena,
                               r_ena,
                               data_in,
+                              w_ready,
                               data_out,
                               avail);
     input   wire                        clk;
@@ -11,6 +12,7 @@ module arashi_thread_cache # (DATA_WIDTH)
     input   wire                        w_ena;
     input   wire                        r_ena;
     input   wire    [DATA_WIDTH-1:0]    data_in;
+    output  logic                       w_ready;
     output  logic   [DATA_WIDTH-1:0]    data_out;
     output  wire                        avail;
 
@@ -27,10 +29,15 @@ module arashi_thread_cache # (DATA_WIDTH)
             buff[0]         <= 0;
             w_ptr           <= 0;
             r_ptr           <= 0;
+            w_ready         <= 0;
         end else begin 
             if (w_ena && backlog != 2'b11) begin
                 buff[w_ptr] <= data_in;
                 w_ptr       <= w_ptr + 1;
+                w_ready     <= 1;
+            end
+            else begin
+                w_ready     <= 0;
             end
             if (r_ena && backlog > 0) begin
                 data_out    <= buff[r_ptr];

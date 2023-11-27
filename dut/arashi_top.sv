@@ -5,6 +5,7 @@ module arashi_top # (DATA_WIDTH = 32,
                      rstn,
                      ctrl,
                      data_in,
+                     w_ready,
                      data_out);
 
     localparam THREAD_NUM = 1 << THREAD_NUM_WIDTH;
@@ -17,6 +18,8 @@ module arashi_top # (DATA_WIDTH = 32,
     input   wire        [THREAD_NUM*2-1:0]          ctrl;
     // input data (write data)
     input   wire        [DATA_WIDTH*THREAD_NUM-1:0] data_in;
+    // 1 indict data is cached
+    output  wire        [THREAD_NUM-1:0]            w_ready;
     // output data
     output  wire        [DATA_WIDTH*THREAD_NUM-1:0] data_out;
 
@@ -26,14 +29,8 @@ module arashi_top # (DATA_WIDTH = 32,
             // read enable
             wire        [THREAD_NUM-1:0]            r_ena;
 
-            // data available in cache
-            wire        [THREAD_NUM-1:0]            cache_avail;
-
-            // thread id to read from cache
-            wire        [THREAD_NUM_WIDTH-1:0]      toread;
-
             // enable reading from cache
-            wire                                    rcache;
+            wire                                    cache_ready;
 
             // data read from cache
             wire        [DATA_WIDTH-1:0]            cache2mem;
@@ -59,25 +56,18 @@ module arashi_top # (DATA_WIDTH = 32,
              cache (.clk(clk),
                     .rstn(rstn),
                     .w_ena(w_ena),
-                    .toread(toread),
-                    .rcache(rcache),
+                    .cache_ready(cache_ready),
                     .data_in(data_in),
-                    .data_out(cache2mem),
-                    .avail(cache_avail));
-
-    arashi_arbiter # (DATA_WIDTH,
-                      MEM_WIDTH,
-                      THREAD_NUM_WIDTH) 
-             arbiter (.clk(clk),
-                      .rstn(rstn),
-                      .avail(cache_avail),
-                      .toread(toread),
-                      .rcache(rcache));
+                    .w_ready(w_ready),
+                    .data_out(cache2mem));
 
     arashi_mem # (DATA_WIDTH,
+                  THREAD_NUM_WIDTH,
                   MEM_WIDTH)
              mem (.clk(clk),
                   .rstn(rstn),
-                  .rcache(rcache),
-                  .cache2mem(cache2mem));
+                  .r_ena(r_ena),
+                  .cache_ready(cache_ready),
+                  .cache2mem(cache2mem),
+                  .data_out(data_out));
 endmodule

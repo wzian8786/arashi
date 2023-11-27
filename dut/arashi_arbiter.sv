@@ -1,18 +1,17 @@
 module arashi_arbiter # (DATA_WIDTH,
-                         MEM_WIDTH,
                          THREAD_NUM_WIDTH)
                         (clk,
                          rstn,
                          avail,
-                         toread,
-                         rcache);
+                         thread_id,
+                         ready);
     localparam THREAD_NUM = 1 << THREAD_NUM_WIDTH;
 
     input   wire                                    clk;
     input   wire                                    rstn;
     input   wire    [THREAD_NUM-1:0]                avail;
-    output  logic   [THREAD_NUM_WIDTH-1:0]          toread;
-    output  logic                                   rcache;
+    output  logic   [THREAD_NUM_WIDTH-1:0]          thread_id;
+    output  logic                                   ready;
 
             wire    [THREAD_NUM-1:0]                savail;
             logic   [THREAD_NUM_WIDTH-1:0]          next;
@@ -20,20 +19,20 @@ module arashi_arbiter # (DATA_WIDTH,
 
     always_ff @ (posedge clk) begin
         if (!rstn) begin
-            toread <= 0;
-            rcache <= 0;
+            thread_id <= 0;
+            ready <= 0;
         end else begin
             if (any_avail) begin
-                toread <= toread + next;
-                rcache <= 1;
+                thread_id <= thread_id + next;
+                ready <= 1;
             end else begin
-                toread <= 0;
-                rcache <= 0;
+                thread_id <= 0;
+                ready <= 0;
             end
         end
     end
 
-    assign savail = { avail, avail } >> toread;
+    assign savail = { avail, avail } >> thread_id;
     assign any_avail = |avail;
 
 `ifdef SIM

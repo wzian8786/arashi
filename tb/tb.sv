@@ -10,6 +10,7 @@ module tb;
 
     logic   [7:0]       ctrl;
     logic   [127:0]     data_in;
+    wire    [3:0]       w_ready;
     wire    [127:0]     data_out;
 
     R               r;
@@ -42,5 +43,6 @@ module tb;
                    .rstn(rstn),
                    .ctrl(ctrl),
                    .data_in(data_in),
+                   .w_ready(w_ready),
                    .data_out(data_out));
 endmodule
