@@ -43,6 +43,9 @@ module arashi_thread_cache # (DATA_WIDTH)
                 data_out    <= buff[r_ptr];
                 r_ptr       <= r_ptr + 1;
             end
+            else begin
+                data_out    <= 0;
+            end
         end
     end
 

@@ -22,10 +22,8 @@ module tb;
         $fsdbDumpfile("tb.fsdb");
         $fsdbDumpvars(0, tb);
         clk = 1'b0;
-        ctrl[0] = 0;
-        ctrl[1] = 0;
-        ctrl[2] = 0;
-        ctrl[3] = 0;
+        ctrl = 0;
+        data_in = 0;
         #1 rstn = 1'b0;
         #10 rstn = 1'b1;
 

@@ -23,7 +23,7 @@ module arashi_arbiter # (DATA_WIDTH,
             ready <= 0;
         end else begin
             if (any_avail) begin
-                thread_id <= thread_id + next;
+                thread_id <= thread_id + next + 1;
                 ready <= 1;
             end else begin
                 thread_id <= 0;
