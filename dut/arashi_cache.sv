@@ -3,6 +3,8 @@ module arashi_cache # (DATA_WIDTH,
                       (clk,
                        rstn,
                        w_ena,
+                       w_id,
+                       mem_ready,
                        data_in,
                        w_ready,
                        data_out,
@@ -11,6 +13,8 @@ module arashi_cache # (DATA_WIDTH,
     input   wire                                clk;
     input   wire                                rstn;
     input   wire    [THREAD_NUM-1:0]            w_ena;
+    input   wire    [THREAD_NUM-1:0]            w_id;
+    input   wire                                mem_ready;
     input   wire    [DATA_WIDTH*THREAD_NUM-1:0] data_in;
     output  wire    [THREAD_NUM-1:0]            w_ready;
     output  wire    [DATA_WIDTH-1:0]            data_out;
@@ -30,7 +34,7 @@ module arashi_cache # (DATA_WIDTH,
         end
     end
 
-    assign r_ena = cache_ready << read_thread_id;
+    assign r_ena = (mem_ready & cache_ready) << read_thread_id;
     assign data_out = data_all[read_thread_id_reg];
 
     generate
@@ -39,6 +43,7 @@ module arashi_cache # (DATA_WIDTH,
         arashi_thread_cache # (DATA_WIDTH) thread_cache(.clk(clk),
                                                         .rstn(rstn),
                                                         .w_ena(w_ena[i]), 
+                                                        .w_id(w_id[i]), 
                                                         .r_ena(r_ena[i]), 
                                                         .data_in(data_in[DATA_WIDTH*(i+1)-1:DATA_WIDTH*i]),
                                                         .w_ready(w_ready[i]),

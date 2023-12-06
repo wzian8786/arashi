@@ -5,6 +5,7 @@ module arashi_mem # (DATA_WIDTH,
                      rstn,
                      r_ena,
                      cache_ready,
+                     mem_ready,
                      cache2mem,
                      data_out,
                      r_ready);
@@ -17,6 +18,7 @@ module arashi_mem # (DATA_WIDTH,
     input   wire                                cache_ready;
     input   wire    [DATA_WIDTH-1:0]            cache2mem;
     output  wire    [DATA_WIDTH*THREAD_NUM-1:0] data_out;
+    output  wire                                mem_ready;
     output  logic   [THREAD_NUM-1:0]            r_ready;
 
             logic   [MEM_WIDTH-1:0]             wptr;
@@ -103,18 +105,27 @@ module arashi_mem # (DATA_WIDTH,
 
             if (read_ready && backlog > 0) begin
 `ifdef SIM
-                data_out_reg[read_thread_id] <= mem[rptr];
+                for (integer i = 0; i < THREAD_NUM; ++i) begin
+                    if (i == read_thread_id)
+                        data_out_reg[i] <= mem[rptr];
+                    else
+                        data_out_reg[i] <= 0;
+                end
 `endif
                 rptr <= rptr + 1;
                 r_ready <= 1 << read_thread_id;
             end
             else begin
+                for (integer i = 0; i < THREAD_NUM; ++i) begin
+                    data_out_reg[i] <= 0;
+                end
                 r_ready = 0;
             end
         end
     end
 
     assign backlog = wptr - rptr;
+    assign mem_ready = backlog != NO_MORE;
 
     arashi_arbiter # (DATA_WIDTH,
                       THREAD_NUM_WIDTH) 

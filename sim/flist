@@ -1,4 +1,3 @@
-../tb/tb.sv
 ../dut/arashi_top.sv
 ../dut/arashi_ctrl_decoder.sv
 ../dut/arashi_cache.sv
